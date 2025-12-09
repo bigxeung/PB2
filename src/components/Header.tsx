@@ -5,7 +5,7 @@ import { faSearch, faHeart, faSignOutAlt, faBars, faTimes } from '@fortawesome/f
 import { logout, getCurrentUser } from '../utils/auth';
 import toast from 'react-hot-toast';
 
-function Header(): JSX.Element {
+function Header() {
   const location = useLocation();
   const navigate = useNavigate();
   const user = getCurrentUser();

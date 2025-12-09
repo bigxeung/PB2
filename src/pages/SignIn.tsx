@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { login, tryRegister, getRememberedEmail } from '../utils/auth';
 import toast from 'react-hot-toast';
 
-function SignIn(): JSX.Element {
+function SignIn() {
   const navigate = useNavigate();
   const [isLoginMode, setIsLoginMode] = useState<boolean>(true);
   const [isFlipping, setIsFlipping] = useState<boolean>(false);

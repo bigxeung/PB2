@@ -1,30 +1,22 @@
-import { useState, useEffect } from 'react';
-import type { WishlistItem } from '../types';
 import Header from '../components/Header';
 import MovieCard from '../components/MovieCard';
-import { getWishlist, clearWishlist } from '../utils/storage';
+import { clearWishlist } from '../utils/storage';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faTrash, faHeart } from '@fortawesome/free-solid-svg-icons';
 import toast from 'react-hot-toast';
+import { useAppSelector, useAppDispatch } from '../store/hooks';
+import { clearAll } from '../store/wishlistSlice';
 
 function Wishlist() {
-  const [movies, setMovies] = useState<WishlistItem[]>([]);
-
-  useEffect(() => {
-    loadWishlist();
-  }, []);
-
-  const loadWishlist = (): void => {
-    const wishlist = getWishlist();
-    setMovies(wishlist);
-  };
+  const dispatch = useAppDispatch();
+  const movies = useAppSelector((state) => state.wishlist.items);
 
   const handleClearAll = (): void => {
     if (movies.length === 0) return;
 
     if (window.confirm('정말 모든 항목을 삭제하시겠습니까?')) {
       clearWishlist();
-      setMovies([]);
+      dispatch(clearAll());
       toast.success('위시리스트가 비워졌습니다.');
     }
   };
@@ -70,7 +62,6 @@ function Wishlist() {
                     release_date: movie.release_date || '',
                     overview: movie.overview || ''
                   }}
-                  onWishlistChange={loadWishlist}
                 />
               ))}
             </div>

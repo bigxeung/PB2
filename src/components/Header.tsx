@@ -2,13 +2,18 @@ import { useState, useEffect, useRef } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faSearch, faHeart, faSignOutAlt, faBars, faTimes } from '@fortawesome/free-solid-svg-icons';
-import { logout, getCurrentUser } from '../utils/auth';
+import { logout } from '../utils/auth';
+import { useAppSelector, useAppDispatch } from '../store/hooks';
+import { setLoggedOut } from '../store/authSlice';
 import toast from 'react-hot-toast';
 
 function Header() {
   const location = useLocation();
   const navigate = useNavigate();
-  const user = getCurrentUser();
+  const dispatch = useAppDispatch();
+
+  // Redux에서 사용자 정보 가져오기
+  const user = useAppSelector((state) => state.auth.currentUser);
 
   // 스크롤 관련 상태
   const [scrollY, setScrollY] = useState<number>(0);
@@ -44,6 +49,7 @@ function Header() {
 
   const handleLogout = (): void => {
     logout();
+    dispatch(setLoggedOut());
     toast.success('로그아웃되었습니다.');
     navigate('/signin');
   };

@@ -1,5 +1,5 @@
 import { Navigate } from 'react-router-dom';
-import { isAuthenticated } from '../utils/auth';
+import { useAppSelector } from '../store/hooks';
 import type { ReactNode } from 'react';
 
 interface ProtectedRouteProps {
@@ -7,7 +7,9 @@ interface ProtectedRouteProps {
 }
 
 function ProtectedRoute({ children }: ProtectedRouteProps) {
-  if (!isAuthenticated()) {
+  const isLoggedIn = useAppSelector((state) => state.auth.isLoggedIn);
+
+  if (!isLoggedIn) {
     return <Navigate to="/signin" replace />;
   }
 

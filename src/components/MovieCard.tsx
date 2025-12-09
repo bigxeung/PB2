@@ -4,9 +4,10 @@ import { faHeart as faHeartRegular } from '@fortawesome/free-regular-svg-icons';
 import { faStar } from '@fortawesome/free-solid-svg-icons';
 import type { Movie } from '../types';
 import { getImageUrl } from '../utils/tmdb';
-import { isInWishlist, addToWishlist, removeFromWishlist } from '../utils/storage';
-import { useState, type MouseEvent } from 'react';
+import { type MouseEvent } from 'react';
 import toast from 'react-hot-toast';
+import { useAppSelector, useAppDispatch } from '../store/hooks';
+import { addItem, removeItem } from '../store/wishlistSlice';
 
 interface MovieCardProps {
   movie: Movie;
@@ -14,18 +15,26 @@ interface MovieCardProps {
 }
 
 function MovieCard({ movie, onWishlistChange }: MovieCardProps) {
-  const [isWishlisted, setIsWishlisted] = useState<boolean>(isInWishlist(movie.id));
+  const dispatch = useAppDispatch();
+  const wishlistItems = useAppSelector((state) => state.wishlist.items);
+  const isWishlisted = wishlistItems.some(item => item.id === movie.id);
 
   const handleWishlistToggle = (e: MouseEvent<HTMLButtonElement>): void => {
     e.stopPropagation();
 
     if (isWishlisted) {
-      removeFromWishlist(movie.id);
-      setIsWishlisted(false);
+      dispatch(removeItem(movie.id));
       toast.success('위시리스트에서 제거되었습니다.');
     } else {
-      addToWishlist(movie);
-      setIsWishlisted(true);
+      dispatch(addItem({
+        id: movie.id,
+        title: movie.title,
+        poster_path: movie.poster_path,
+        vote_average: movie.vote_average,
+        release_date: movie.release_date,
+        overview: movie.overview,
+        addedAt: new Date().toISOString(),
+      }));
       toast.success('위시리스트에 추가되었습니다.');
     }
 

@@ -2,9 +2,12 @@ import { useState, useRef, useEffect, type FormEvent, type ChangeEvent } from 'r
 import { useNavigate } from 'react-router-dom';
 import { login, tryRegister, getRememberedEmail } from '../utils/auth';
 import toast from 'react-hot-toast';
+import { useAppDispatch } from '../store/hooks';
+import { setLoggedIn } from '../store/authSlice';
 
 function SignIn() {
   const navigate = useNavigate();
+  const dispatch = useAppDispatch();
   const [isLoginMode, setIsLoginMode] = useState<boolean>(true);
   const [isFlipping, setIsFlipping] = useState<boolean>(false);
   const [email, setEmail] = useState<string>(getRememberedEmail());
@@ -28,6 +31,7 @@ function SignIn() {
     try {
       if (isLoginMode) {
         login(email, password, rememberMe);
+        dispatch(setLoggedIn({ user: email }));
         toast.success('로그인 성공!');
         navigate('/');
       } else {

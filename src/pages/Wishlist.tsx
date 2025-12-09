@@ -7,7 +7,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faTrash, faHeart } from '@fortawesome/free-solid-svg-icons';
 import toast from 'react-hot-toast';
 
-function Wishlist(): JSX.Element {
+function Wishlist() {
   const [movies, setMovies] = useState<WishlistItem[]>([]);
 
   useEffect(() => {

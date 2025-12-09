@@ -7,7 +7,7 @@ import { getPopularMovies, getNowPlayingMovies, getTopRatedMovies, getUpcomingMo
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPlay, faInfoCircle, faChevronLeft, faChevronRight } from '@fortawesome/free-solid-svg-icons';
 
-function Home(): JSX.Element {
+function Home() {
   const [popularMovies, setPopularMovies] = useState<Movie[]>([]);
   const [nowPlayingMovies, setNowPlayingMovies] = useState<Movie[]>([]);
   const [topRatedMovies, setTopRatedMovies] = useState<Movie[]>([]);

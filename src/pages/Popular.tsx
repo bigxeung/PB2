@@ -9,7 +9,7 @@ import { faThLarge, faList, faArrowUp, faChevronLeft, faChevronRight } from '@fo
 
 type ViewMode = 'infinite' | 'table';
 
-function Popular(): JSX.Element {
+function Popular() {
   const [movies, setMovies] = useState<Movie[]>([]);
   const [page, setPage] = useState<number>(1);
   const [totalPages, setTotalPages] = useState<number>(0);

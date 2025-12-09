@@ -15,7 +15,7 @@ interface SearchHistoryItem {
   results: number;
 }
 
-function Search(): JSX.Element {
+function Search() {
   const [query, setQuery] = useState<string>('');
   const [movies, setMovies] = useState<Movie[]>([]);
   const [genres, setGenres] = useState<Genre[]>([]);

@@ -1,0 +1,82 @@
+# CODEOWNERS - 코드 소유자 정의
+# PR 생성 시 변경된 파일에 따라 자동으로 리뷰어가 지정됩니다.
+# 문서: https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-code-owners
+
+# ============================================
+# 기본 소유자 (모든 파일)
+# ============================================
+# 아래 규칙에 해당하지 않는 모든 파일의 기본 리뷰어
+*                           @bigxeung
+
+# ============================================
+# 프론트엔드 코드
+# ============================================
+# React 컴포넌트
+/src/components/            @bigxeung
+/src/pages/                 @bigxeung
+
+# 커스텀 훅
+/src/hooks/                 @bigxeung
+
+# 상태 관리 (Redux)
+/src/store/                 @bigxeung
+
+# 유틸리티 함수
+/src/utils/                 @bigxeung
+
+# 타입 정의
+/src/types/                 @bigxeung
+
+# ============================================
+# 스타일링
+# ============================================
+*.css                       @bigxeung
+*.scss                      @bigxeung
+tailwind.config.*           @bigxeung
+
+# ============================================
+# 설정 파일
+# ============================================
+# 빌드 설정
+vite.config.*               @bigxeung
+tsconfig.json               @bigxeung
+postcss.config.*            @bigxeung
+
+# 패키지 관리
+package.json                @bigxeung
+package-lock.json           @bigxeung
+
+# 환경 설정
+.env.example                @bigxeung
+
+# ============================================
+# CI/CD 및 GitHub 설정
+# ============================================
+/.github/                   @bigxeung
+/.github/workflows/         @bigxeung
+/.github/ISSUE_TEMPLATE/    @bigxeung
+
+# ============================================
+# 문서
+# ============================================
+README.md                   @bigxeung
+CHANGELOG.md                @bigxeung
+CLAUDE.md                   @bigxeung
+/docs/                      @bigxeung
+
+# ============================================
+# 테스트
+# ============================================
+*.test.ts                   @bigxeung
+*.test.tsx                  @bigxeung
+*.spec.ts                   @bigxeung
+*.spec.tsx                  @bigxeung
+/tests/                     @bigxeung
+
+# ============================================
+# 팀 프로젝트인 경우 예시 (주석 해제하여 사용)
+# ============================================
+# /src/components/           @frontend-team
+# /src/store/                @state-team
+# /.github/workflows/        @devops-team
+# /docs/                     @docs-team

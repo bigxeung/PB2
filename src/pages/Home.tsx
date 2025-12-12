@@ -1,11 +1,65 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import type { Movie } from '../types';
 import Header from '../components/Header';
 import MovieCard from '../components/MovieCard';
 import LoadingSpinner from '../components/LoadingSpinner';
 import { getPopularMovies, getNowPlayingMovies, getTopRatedMovies, getUpcomingMovies } from '../utils/tmdb';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faPlay, faInfoCircle, faChevronLeft, faChevronRight } from '@fortawesome/free-solid-svg-icons';
+import { faPlay, faInfoCircle, faChevronLeft, faChevronRight, faChevronDown } from '@fortawesome/free-solid-svg-icons';
+import { useReducedMotion } from '../hooks/useAnimation';
+
+// 섹션 컴포넌트 (스크롤 애니메이션 포함)
+interface MovieSectionProps {
+  title: string;
+  movies: Movie[];
+  isVisible: boolean;
+  index: number;
+}
+
+function MovieSection({ title, movies, isVisible, index }: MovieSectionProps) {
+  const prefersReducedMotion = useReducedMotion();
+
+  return (
+    <section
+      className={`transition-all duration-700 ${
+        isVisible
+          ? 'opacity-100 translate-y-0'
+          : prefersReducedMotion
+          ? 'opacity-100 translate-y-0'
+          : 'opacity-0 translate-y-10'
+      }`}
+      style={{
+        transitionDelay: prefersReducedMotion ? '0ms' : `${index * 100}ms`,
+      }}
+    >
+      <h2 className="text-xl md:text-2xl font-bold text-white mb-4 flex items-center gap-3 group">
+        <span className="hover-underline cursor-pointer">{title}</span>
+        <span className="text-red-600 text-sm font-normal opacity-0 group-hover:opacity-100 transition-opacity">
+          모두 보기 &rarr;
+        </span>
+      </h2>
+      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
+        {movies.slice(0, 12).map((movie, movieIndex) => (
+          <div
+            key={movie.id}
+            className={`transition-all duration-500 ${
+              isVisible
+                ? 'opacity-100 translate-y-0'
+                : prefersReducedMotion
+                ? 'opacity-100 translate-y-0'
+                : 'opacity-0 translate-y-5'
+            }`}
+            style={{
+              transitionDelay: prefersReducedMotion ? '0ms' : `${index * 100 + movieIndex * 50}ms`,
+            }}
+          >
+            <MovieCard movie={movie} index={movieIndex} />
+          </div>
+        ))}
+      </div>
+    </section>
+  );
+}
 
 function Home() {
   const [popularMovies, setPopularMovies] = useState<Movie[]>([]);
@@ -16,8 +70,14 @@ function Home() {
   const [featuredMovie, setFeaturedMovie] = useState<Movie | null>(null);
   const [featuredIndex, setFeaturedIndex] = useState<number>(0);
 
-  // 히어로 배너용 ref
+  // 스크롤 관련 상태
+  const [visibleSections, setVisibleSections] = useState<Set<number>>(new Set());
+  const [heroScrollProgress, setHeroScrollProgress] = useState<number>(0);
+  const prefersReducedMotion = useReducedMotion();
+
+  // Refs
   const heroRef = useRef<HTMLDivElement>(null);
+  const sectionsRef = useRef<(HTMLDivElement | null)[]>([]);
 
   // 히어로 후보 영화들 (배경 이미지가 있는 인기 영화 5개)
   const heroMovies = popularMovies.filter(m => m.backdrop_path).slice(0, 5);
@@ -88,6 +148,47 @@ function Home() {
     setFeaturedMovie(heroMovies[index]);
   };
 
+  // 스크롤 기반 패럴랙스 및 섹션 가시성
+  const handleScroll = useCallback(() => {
+    if (!heroRef.current) return;
+
+    const scrollY = window.scrollY;
+    const heroHeight = heroRef.current.offsetHeight;
+
+    // 히어로 패럴랙스 진행도 (0 ~ 1)
+    const progress = Math.min(scrollY / heroHeight, 1);
+    setHeroScrollProgress(progress);
+
+    // 섹션 가시성 체크
+    sectionsRef.current.forEach((section, index) => {
+      if (!section) return;
+
+      const rect = section.getBoundingClientRect();
+      const isVisible = rect.top < window.innerHeight * 0.8;
+
+      if (isVisible) {
+        setVisibleSections(prev => new Set([...prev, index]));
+      }
+    });
+  }, []);
+
+  useEffect(() => {
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    // 초기 로드 시 한번 실행
+    handleScroll();
+
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, [handleScroll, isLoading]);
+
+  // 스크롤 다운 핸들러
+  const scrollToContent = () => {
+    const contentTop = heroRef.current?.offsetHeight || 0;
+    window.scrollTo({
+      top: contentTop - 100,
+      behavior: 'smooth',
+    });
+  };
+
   if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-[#141414]">
@@ -104,10 +205,13 @@ function Home() {
       {featuredMovie && (
         <div
           ref={heroRef}
-          className="relative h-[85vh] bg-cover bg-center transition-all duration-1000"
+          className="relative h-[85vh] bg-cover bg-center overflow-hidden gpu-accelerated"
           style={{
             backgroundImage: `linear-gradient(to right, rgba(20,20,20,0.95) 0%, rgba(20,20,20,0.4) 50%, rgba(20,20,20,0.95) 100%),
-              url(https://image.tmdb.org/t/p/original${featuredMovie.backdrop_path})`
+              url(https://image.tmdb.org/t/p/original${featuredMovie.backdrop_path})`,
+            backgroundPositionY: prefersReducedMotion ? 'center' : `${heroScrollProgress * 30}%`,
+            transform: prefersReducedMotion ? 'none' : `scale(${1 + heroScrollProgress * 0.1})`,
+            transition: 'background-image 1s ease-in-out',
           }}
         >
           {/* 좌우 네비게이션 버튼 */}
@@ -157,71 +261,68 @@ function Home() {
                 <button
                   key={index}
                   onClick={() => goToHeroIndex(index)}
-                  className={`w-3 h-3 rounded-full transition-all ${
+                  className={`h-3 rounded-full transition-all duration-300 ${
                     index === featuredIndex
                       ? 'bg-white w-8'
-                      : 'bg-white/50 hover:bg-white/80'
+                      : 'bg-white/50 hover:bg-white/80 w-3'
                   }`}
                 />
               ))}
             </div>
           </div>
+
+          {/* 스크롤 다운 인디케이터 */}
+          <button
+            onClick={scrollToContent}
+            className="absolute bottom-8 left-1/2 -translate-x-1/2 text-white/70 hover:text-white transition-all scroll-indicator z-20"
+            aria-label="콘텐츠로 스크롤"
+          >
+            <FontAwesomeIcon icon={faChevronDown} className="text-3xl" />
+          </button>
+
+          {/* 히어로 오버레이 (스크롤 시 페이드) */}
+          <div
+            className="absolute inset-0 bg-black pointer-events-none transition-opacity duration-300"
+            style={{ opacity: prefersReducedMotion ? 0 : heroScrollProgress * 0.5 }}
+          />
         </div>
       )}
 
       {/* 영화 목록 섹션 */}
       <div className="px-4 md:px-8 -mt-20 relative z-10 space-y-12 pb-20">
-        {/* 인기 영화 */}
-        <section>
-          <h2 className="text-xl md:text-2xl font-bold text-white mb-4">인기 영화</h2>
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
-            {popularMovies.slice(0, 12).map((movie) => (
-              <MovieCard key={movie.id} movie={movie} />
-            ))}
+        {/* 섹션들 - 스크롤 애니메이션 적용 */}
+        {[
+          { title: '인기 영화', movies: popularMovies },
+          { title: '현재 상영중', movies: nowPlayingMovies },
+          { title: '높은 평점', movies: topRatedMovies },
+          { title: '개봉 예정', movies: upcomingMovies },
+        ].map((section, index) => (
+          <div
+            key={section.title}
+            ref={(el) => { sectionsRef.current[index] = el; }}
+          >
+            <MovieSection
+              title={section.title}
+              movies={section.movies}
+              isVisible={visibleSections.has(index)}
+              index={index}
+            />
           </div>
-        </section>
-
-        {/* 현재 상영중 */}
-        <section>
-          <h2 className="text-xl md:text-2xl font-bold text-white mb-4">현재 상영중</h2>
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
-            {nowPlayingMovies.slice(0, 12).map((movie) => (
-              <MovieCard key={movie.id} movie={movie} />
-            ))}
-          </div>
-        </section>
-
-        {/* 높은 평점 */}
-        <section>
-          <h2 className="text-xl md:text-2xl font-bold text-white mb-4">높은 평점</h2>
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
-            {topRatedMovies.slice(0, 12).map((movie) => (
-              <MovieCard key={movie.id} movie={movie} />
-            ))}
-          </div>
-        </section>
-
-        {/* 개봉 예정 (4번째 API) */}
-        <section>
-          <h2 className="text-xl md:text-2xl font-bold text-white mb-4">개봉 예정</h2>
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
-            {upcomingMovies.slice(0, 12).map((movie) => (
-              <MovieCard key={movie.id} movie={movie} />
-            ))}
-          </div>
-        </section>
+        ))}
       </div>
 
-      {/* 애니메이션 CSS */}
-      <style>{`
-        @keyframes fadeIn {
-          from { opacity: 0; transform: translateY(10px); }
-          to { opacity: 1; transform: translateY(0); }
-        }
-        .animate-fadeIn {
-          animation: fadeIn 0.5s ease-out;
-        }
-      `}</style>
+      {/* 맨 위로 스크롤 버튼 */}
+      <button
+        onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+        className={`fixed bottom-8 right-8 w-12 h-12 bg-red-600 text-white rounded-full shadow-lg
+          flex items-center justify-center transition-all duration-300 hover:bg-red-700 hover:scale-110 z-50
+          ${heroScrollProgress > 0.3 ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10 pointer-events-none'}`}
+        aria-label="맨 위로"
+      >
+        <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 10l7-7m0 0l7 7m-7-7v18" />
+        </svg>
+      </button>
     </div>
   );
 }

@@ -49,7 +49,6 @@ export function useAnimation(
     autoPlay = false,
     onStart,
     onEnd,
-    onIteration,
   } = options;
 
   const animationRef = useRef<Animation | null>(null);
@@ -303,7 +302,7 @@ export function useSpring(
 
   const [value, setValue] = useState(targetValue);
   const velocity = useRef(0);
-  const animationFrame = useRef<number>();
+  const animationFrame = useRef<number | undefined>(undefined);
 
   useEffect(() => {
     let currentValue = value;

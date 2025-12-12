@@ -111,7 +111,7 @@ function LoadingSpinner({
     </div>
   );
 
-  const loaders: Record<string, JSX.Element> = {
+  const loaders: Record<string, React.ReactNode> = {
     spinner: <Spinner />,
     dots: <DotsLoader />,
     netflix: <NetflixLoader />,

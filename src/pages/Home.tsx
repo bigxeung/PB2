@@ -240,7 +240,7 @@ function Home() {
       )}
 
       {/* 영화 목록 섹션 */}
-      <div className="px-4 md:px-8 -mt-16 relative z-10 space-y-10 pb-16">
+      <div className="px-4 md:px-8 pt-8 relative z-10 space-y-10 pb-16">
         {[
           { title: '인기 영화', movies: popularMovies },
           { title: '현재 상영중', movies: nowPlayingMovies },

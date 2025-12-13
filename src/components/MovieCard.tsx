@@ -8,11 +8,11 @@ import { type MouseEvent, useState } from 'react';
 import toast from 'react-hot-toast';
 import { useAppSelector, useAppDispatch } from '../store/hooks';
 import { addItem, removeItem } from '../store/wishlistSlice';
+import MovieDetailModal from './MovieDetailModal';
 
 interface MovieCardProps {
   movie: Movie;
   onWishlistChange?: () => void;
-  index?: number;
 }
 
 function MovieCard({ movie, onWishlistChange }: MovieCardProps) {
@@ -20,6 +20,7 @@ function MovieCard({ movie, onWishlistChange }: MovieCardProps) {
   const wishlistItems = useAppSelector((state) => state.wishlist.items);
   const isWishlisted = wishlistItems.some(item => item.id === movie.id);
   const [isHovered, setIsHovered] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   const handleWishlistToggle = (e: MouseEvent<HTMLButtonElement>): void => {
     e.stopPropagation();
@@ -45,12 +46,18 @@ function MovieCard({ movie, onWishlistChange }: MovieCardProps) {
     }
   };
 
+  const handleCardClick = () => {
+    setIsModalOpen(true);
+  };
+
   return (
-    <div
-      className="movie-card relative group"
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
-    >
+    <>
+      <div
+        className="movie-card relative group"
+        onMouseEnter={() => setIsHovered(true)}
+        onMouseLeave={() => setIsHovered(false)}
+        onClick={handleCardClick}
+      >
       {/* 포스터 이미지 */}
       <div className="aspect-[2/3] rounded overflow-hidden bg-gray-800">
         <img
@@ -94,7 +101,14 @@ function MovieCard({ movie, onWishlistChange }: MovieCardProps) {
           {movie.overview || '줄거리 정보가 없습니다.'}
         </p>
       </div>
-    </div>
+      </div>
+
+      <MovieDetailModal
+        movie={movie}
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+      />
+    </>
   );
 }
 

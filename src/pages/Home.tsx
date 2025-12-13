@@ -6,6 +6,7 @@ import LoadingSpinner from '../components/LoadingSpinner';
 import { getPopularMovies, getNowPlayingMovies, getTopRatedMovies, getUpcomingMovies } from '../utils/tmdb';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPlay, faInfoCircle, faChevronLeft, faChevronRight, faChevronDown } from '@fortawesome/free-solid-svg-icons';
+import { useSwipe } from '../hooks/useResponsive';
 
 // 섹션 컴포넌트
 interface MovieSectionProps {
@@ -118,6 +119,9 @@ function Home() {
     setFeaturedMovie(heroMovies[index]);
   };
 
+  // 히어로 배너 스와이프 제스처
+  const swipeHandlers = useSwipe(goToNextHero, goToPrevHero, 50);
+
   // 스크롤 핸들러
   const handleScroll = useCallback(() => {
     const scrollY = window.scrollY;
@@ -166,12 +170,13 @@ function Home() {
       {featuredMovie && (
         <div
           ref={heroRef}
-          className="relative h-[80vh] bg-cover bg-center"
+          className="relative h-[80vh] bg-cover bg-center hero-section touch-feedback"
           style={{
             backgroundImage: `linear-gradient(to right, rgba(20,20,20,0.9) 0%, rgba(20,20,20,0.4) 50%, rgba(20,20,20,0.9) 100%),
               url(https://image.tmdb.org/t/p/original${featuredMovie.backdrop_path})`,
             transition: 'background-image 0.5s ease',
           }}
+          {...swipeHandlers}
         >
           {/* 좌우 네비게이션 버튼 */}
           <button

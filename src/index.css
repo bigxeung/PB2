@@ -14,11 +14,63 @@
   --ease-out-back: cubic-bezier(0.34, 1.56, 0.64, 1);
   --ease-smooth: cubic-bezier(0.4, 0, 0.2, 1);
 
-  /* 색상 변수 */
+  /* 색상 변수 - 다크 모드 (기본) */
   --netflix-red: #e50914;
   --netflix-red-dark: #b20710;
   --netflix-black: #141414;
   --netflix-gray: #808080;
+  --bg-primary: #141414;
+  --bg-secondary: #1f1f1f;
+  --bg-card: #181818;
+  --text-primary: #ffffff;
+  --text-secondary: #b3b3b3;
+  --text-muted: #808080;
+
+  /* 폰트 크기 스케일 */
+  --font-scale: 1;
+}
+
+/* ============================================
+   다크/라이트 모드 지원
+   ============================================ */
+[data-theme="light"] {
+  --bg-primary: #f5f5f5;
+  --bg-secondary: #ffffff;
+  --bg-card: #ffffff;
+  --text-primary: #141414;
+  --text-secondary: #4a4a4a;
+  --text-muted: #808080;
+}
+
+/* 시스템 설정 기반 자동 감지 (라이트 모드 지원) */
+@media (prefers-color-scheme: light) {
+  :root:not([data-theme="dark"]) {
+    --bg-primary: #f5f5f5;
+    --bg-secondary: #ffffff;
+    --bg-card: #ffffff;
+    --text-primary: #141414;
+    --text-secondary: #4a4a4a;
+    --text-muted: #808080;
+  }
+}
+
+/* ============================================
+   폰트 크기 조절 지원
+   ============================================ */
+[data-font-size="small"] {
+  --font-scale: 0.875;
+}
+
+[data-font-size="large"] {
+  --font-scale: 1.125;
+}
+
+[data-font-size="x-large"] {
+  --font-scale: 1.25;
+}
+
+html {
+  font-size: calc(16px * var(--font-scale));
 }
 
 /* ============================================
@@ -1293,5 +1345,282 @@ html {
 @media (prefers-reduced-motion: reduce) {
   html {
     scroll-behavior: auto;
+  }
+}
+
+/* ============================================
+   터치 디바이스 최적화
+   ============================================ */
+@media (hover: none) and (pointer: coarse) {
+  /* 터치 디바이스에서는 호버 효과 대신 탭 피드백 */
+  .movie-card:hover {
+    transform: none;
+  }
+
+  .movie-card:active {
+    transform: scale(0.98);
+  }
+
+  /* 터치 타겟 크기 최소 44px 보장 (접근성) */
+  button,
+  a,
+  [role="button"] {
+    min-height: 44px;
+    min-width: 44px;
+  }
+
+  /* 터치 스크롤 최적화 */
+  .scrollbar-hide {
+    -webkit-overflow-scrolling: touch;
+    scroll-snap-type: x mandatory;
+  }
+
+  .scrollbar-hide > * {
+    scroll-snap-align: start;
+  }
+}
+
+/* 터치 피드백 스타일 */
+.touch-feedback {
+  -webkit-tap-highlight-color: rgba(229, 9, 20, 0.3);
+}
+
+/* 스와이프 가능한 컨테이너 */
+.swipeable {
+  touch-action: pan-x;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  -webkit-overflow-scrolling: touch;
+}
+
+.swipeable > * {
+  scroll-snap-align: start;
+  flex-shrink: 0;
+}
+
+/* ============================================
+   화면 회전 대응 (Orientation)
+   ============================================ */
+@media screen and (orientation: landscape) and (max-height: 500px) {
+  /* 모바일 가로 모드에서 히어로 섹션 높이 조정 */
+  .hero-section {
+    min-height: 100vh;
+    max-height: 100vh;
+  }
+
+  /* 헤더 컴팩트 모드 */
+  header {
+    padding-top: 0.5rem;
+    padding-bottom: 0.5rem;
+  }
+
+  /* 모달/팝업 최대 높이 제한 */
+  .modal-content {
+    max-height: 90vh;
+    overflow-y: auto;
+  }
+}
+
+@media screen and (orientation: portrait) {
+  /* 세로 모드 최적화 */
+  .hero-section {
+    min-height: 60vh;
+  }
+}
+
+/* 안전 영역 (노치, 홈 인디케이터 대응) */
+@supports (padding: env(safe-area-inset-bottom)) {
+  .safe-area-bottom {
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+
+  .safe-area-top {
+    padding-top: env(safe-area-inset-top);
+  }
+
+  /* 고정 하단 요소에 안전 영역 적용 */
+  .fixed-bottom {
+    padding-bottom: calc(1rem + env(safe-area-inset-bottom));
+  }
+}
+
+/* ============================================
+   반응형 타이포그래피
+   ============================================ */
+/* 뷰포트 기반 폰트 크기 조정 */
+.text-responsive-sm {
+  font-size: clamp(0.75rem, 2vw, 0.875rem);
+}
+
+.text-responsive-base {
+  font-size: clamp(0.875rem, 2.5vw, 1rem);
+}
+
+.text-responsive-lg {
+  font-size: clamp(1rem, 3vw, 1.25rem);
+}
+
+.text-responsive-xl {
+  font-size: clamp(1.25rem, 4vw, 1.5rem);
+}
+
+.text-responsive-2xl {
+  font-size: clamp(1.5rem, 5vw, 2rem);
+}
+
+.text-responsive-hero {
+  font-size: clamp(1.75rem, 6vw, 3rem);
+}
+
+/* ============================================
+   이미지 최적화
+   ============================================ */
+/* 이미지 레이지 로딩 플레이스홀더 */
+.img-placeholder {
+  background: linear-gradient(110deg, #1a1a1a 8%, #2a2a2a 18%, #1a1a1a 33%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s linear infinite;
+}
+
+/* 반응형 이미지 컨테이너 */
+.img-container {
+  position: relative;
+  overflow: hidden;
+  background-color: var(--bg-secondary);
+}
+
+.img-container img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: opacity 0.3s ease;
+}
+
+.img-container img[loading="lazy"] {
+  opacity: 0;
+}
+
+.img-container img.loaded {
+  opacity: 1;
+}
+
+/* 다양한 해상도 대응 이미지 크기 */
+@media (max-width: 640px) {
+  .poster-img {
+    max-width: 150px;
+  }
+}
+
+@media (min-width: 641px) and (max-width: 1024px) {
+  .poster-img {
+    max-width: 200px;
+  }
+}
+
+@media (min-width: 1025px) {
+  .poster-img {
+    max-width: 250px;
+  }
+}
+
+/* ============================================
+   성능 최적화
+   ============================================ */
+/* GPU 가속 최적화 (재사용) */
+.will-change-transform {
+  will-change: transform;
+}
+
+.will-change-opacity {
+  will-change: opacity;
+}
+
+/* 컨텐츠 가시성 최적화 (오프스크린 렌더링 최적화) */
+.content-visibility-auto {
+  content-visibility: auto;
+  contain-intrinsic-size: 0 500px;
+}
+
+/* 레이어 프로모션 최적화 */
+.layer-promote {
+  transform: translateZ(0);
+  backface-visibility: hidden;
+}
+
+/* ============================================
+   고대비 모드 지원 (접근성)
+   ============================================ */
+@media (prefers-contrast: high) {
+  :root {
+    --netflix-red: #ff0000;
+    --bg-primary: #000000;
+    --bg-secondary: #1a1a1a;
+    --text-primary: #ffffff;
+    --text-secondary: #ffffff;
+  }
+
+  .movie-card {
+    border: 2px solid #ffffff;
+  }
+
+  button,
+  a {
+    border: 1px solid currentColor;
+  }
+}
+
+/* ============================================
+   인쇄 스타일
+   ============================================ */
+@media print {
+  header,
+  footer,
+  .no-print {
+    display: none !important;
+  }
+
+  body {
+    background: white;
+    color: black;
+  }
+
+  .movie-card {
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+}
+
+/* ============================================
+   추가 반응형 유틸리티
+   ============================================ */
+/* 모바일 전용 */
+@media (max-width: 639px) {
+  .mobile-only {
+    display: block;
+  }
+  .desktop-only {
+    display: none;
+  }
+
+  /* 모바일에서 그리드 간격 축소 */
+  .mobile-gap-tight {
+    gap: 0.5rem;
+  }
+}
+
+/* 태블릿 전용 */
+@media (min-width: 640px) and (max-width: 1023px) {
+  .tablet-only {
+    display: block;
+  }
+}
+
+/* 데스크톱 전용 */
+@media (min-width: 1024px) {
+  .desktop-only {
+    display: block;
+  }
+  .mobile-only {
+    display: none;
   }
 }

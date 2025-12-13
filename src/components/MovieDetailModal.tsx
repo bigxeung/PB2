@@ -69,6 +69,7 @@ function MovieDetailModal({ movie, isOpen, onClose }: MovieDetailModalProps) {
         {/* 닫기 버튼 */}
         <button
           onClick={onClose}
+          aria-label="닫기"
           className="absolute top-4 right-4 z-10 w-9 h-9 bg-[#181818] rounded-full flex items-center justify-center text-white hover:bg-[#282828] transition-colors"
         >
           <FontAwesomeIcon icon={faTimes} />

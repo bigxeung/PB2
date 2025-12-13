@@ -4,17 +4,31 @@ import { faHeart as faHeartRegular } from '@fortawesome/free-regular-svg-icons';
 import { faStar } from '@fortawesome/free-solid-svg-icons';
 import type { Movie } from '../types';
 import { getImageUrl } from '../utils/tmdb';
-import { type MouseEvent, useState } from 'react';
+import { type MouseEvent, type KeyboardEvent, useState } from 'react';
 import toast from 'react-hot-toast';
 import { useAppSelector, useAppDispatch } from '../store/hooks';
 import { addItem, removeItem } from '../store/wishlistSlice';
 import MovieDetailModal from './MovieDetailModal';
 
+/**
+ * MovieCard 컴포넌트 Props
+ * @interface MovieCardProps
+ * @property {Movie} movie - 표시할 영화 데이터
+ * @property {function} [onWishlistChange] - 위시리스트 변경 시 콜백
+ */
 interface MovieCardProps {
   movie: Movie;
   onWishlistChange?: () => void;
 }
 
+/**
+ * 영화 카드 컴포넌트
+ * 영화 포스터, 제목, 평점, 줄거리를 표시하고 위시리스트 토글 및 상세 모달 기능 제공
+ *
+ * @component
+ * @example
+ * <MovieCard movie={movieData} onWishlistChange={() => refetch()} />
+ */
 function MovieCard({ movie, onWishlistChange }: MovieCardProps) {
   const dispatch = useAppDispatch();
   const wishlistItems = useAppSelector((state) => state.wishlist.items);
@@ -22,6 +36,10 @@ function MovieCard({ movie, onWishlistChange }: MovieCardProps) {
   const [isHovered, setIsHovered] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
+  /**
+   * 위시리스트 토글 핸들러
+   * @param e - 마우스 이벤트 (이벤트 버블링 방지용)
+   */
   const handleWishlistToggle = (e: MouseEvent<HTMLButtonElement>): void => {
     e.stopPropagation();
 
@@ -46,17 +64,30 @@ function MovieCard({ movie, onWishlistChange }: MovieCardProps) {
     }
   };
 
+  /** 카드 클릭 시 상세 모달 열기 */
   const handleCardClick = () => {
     setIsModalOpen(true);
+  };
+
+  /** 키보드 접근성 - Enter/Space로 모달 열기 */
+  const handleKeyDown = (e: KeyboardEvent<HTMLDivElement>) => {
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      setIsModalOpen(true);
+    }
   };
 
   return (
     <>
       <div
-        className="movie-card relative group"
+        className="movie-card relative group focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 focus:ring-offset-gray-900"
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
         onClick={handleCardClick}
+        onKeyDown={handleKeyDown}
+        tabIndex={0}
+        role="button"
+        aria-label={`${movie.title} 상세 정보 보기`}
       >
       {/* 포스터 이미지 */}
       <div className="aspect-[2/3] rounded overflow-hidden bg-gray-800">

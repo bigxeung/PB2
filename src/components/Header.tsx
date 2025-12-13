@@ -1,10 +1,11 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faSearch, faHeart, faSignOutAlt, faBars, faTimes, faHome, faFire } from '@fortawesome/free-solid-svg-icons';
+import { faSearch, faHeart, faSignOutAlt, faBars, faTimes, faHome, faFire, faSun, faMoon } from '@fortawesome/free-solid-svg-icons';
 import { logout } from '../utils/auth';
 import { useAppSelector, useAppDispatch } from '../store/hooks';
 import { setLoggedOut } from '../store/authSlice';
+import { useTheme } from '../hooks/useResponsive';
 import toast from 'react-hot-toast';
 
 function Header() {
@@ -15,6 +16,9 @@ function Header() {
   // Redux에서 사용자 정보 가져오기
   const user = useAppSelector((state) => state.auth.currentUser);
   const wishlistCount = useAppSelector((state) => state.wishlist.items.length);
+
+  // 테마 관리
+  const { theme, toggleTheme } = useTheme();
 
   // 스크롤 관련 상태
   const [scrollY, setScrollY] = useState<number>(0);
@@ -111,7 +115,17 @@ function Header() {
         </nav>
 
         {/* 사용자 메뉴 */}
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2">
+          {/* 테마 전환 버튼 */}
+          <button
+            onClick={toggleTheme}
+            className="flex items-center justify-center w-9 h-9 text-gray-300 hover:text-yellow-400 hover:bg-yellow-400/10 rounded-full transition-colors"
+            title={theme === 'dark' ? '라이트 모드로 전환' : '다크 모드로 전환'}
+            aria-label={theme === 'dark' ? '라이트 모드로 전환' : '다크 모드로 전환'}
+          >
+            <FontAwesomeIcon icon={theme === 'dark' ? faSun : faMoon} />
+          </button>
+
           {/* 사용자 프로필 */}
           <div className="hidden sm:flex items-center gap-2">
             <div className="w-8 h-8 rounded bg-gradient-to-br from-red-600 to-red-800 flex items-center justify-center text-white font-bold text-sm">
@@ -168,6 +182,24 @@ function Header() {
                 )}
               </Link>
             ))}
+
+            {/* 모바일 테마 전환 */}
+            <div className="mt-3 pt-3 border-t border-white/10 px-4">
+              <button
+                onClick={() => {
+                  toggleTheme();
+                }}
+                className="w-full flex items-center justify-between py-3 px-4 rounded-lg text-gray-300 hover:text-white hover:bg-white/5 transition-colors"
+              >
+                <span className="flex items-center gap-3">
+                  <FontAwesomeIcon icon={theme === 'dark' ? faSun : faMoon} className="w-5" />
+                  <span>{theme === 'dark' ? '라이트 모드' : '다크 모드'}</span>
+                </span>
+                <span className="text-xs text-gray-500">
+                  {theme === 'dark' ? '🌙' : '☀️'}
+                </span>
+              </button>
+            </div>
 
             {/* 모바일 사용자 정보 */}
             <div className="mt-3 pt-3 border-t border-white/10 flex items-center justify-between px-4">

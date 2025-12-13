@@ -122,8 +122,89 @@ body {
     sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  background-color: var(--netflix-black);
-  color: white;
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* ============================================
+   라이트 모드 오버라이드 스타일
+   ============================================ */
+[data-theme="light"] .bg-\[\#141414\] {
+  background-color: var(--bg-primary) !important;
+}
+
+[data-theme="light"] .bg-\[\#181818\] {
+  background-color: var(--bg-card) !important;
+}
+
+[data-theme="light"] .text-white {
+  color: var(--text-primary);
+}
+
+[data-theme="light"] .text-gray-300 {
+  color: var(--text-secondary);
+}
+
+[data-theme="light"] .text-gray-400 {
+  color: var(--text-muted);
+}
+
+[data-theme="light"] .bg-gray-800 {
+  background-color: #e5e5e5 !important;
+}
+
+[data-theme="light"] .bg-gray-700 {
+  background-color: #d4d4d4 !important;
+}
+
+[data-theme="light"] .bg-black\/95 {
+  background-color: rgba(255, 255, 255, 0.95) !important;
+}
+
+[data-theme="light"] .bg-black\/50 {
+  background-color: rgba(255, 255, 255, 0.7) !important;
+}
+
+[data-theme="light"] .bg-black\/80 {
+  background-color: rgba(255, 255, 255, 0.9) !important;
+}
+
+[data-theme="light"] .border-white\/10 {
+  border-color: rgba(0, 0, 0, 0.1) !important;
+}
+
+[data-theme="light"] .movie-card {
+  background-color: var(--bg-card);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+[data-theme="light"] .movie-card:hover {
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+}
+
+[data-theme="light"] .form-input,
+[data-theme="light"] .form-group input {
+  background-color: #e5e5e5;
+  border-color: #d4d4d4;
+  color: var(--text-primary);
+}
+
+[data-theme="light"] .form-input:focus,
+[data-theme="light"] .form-group input:focus {
+  background-color: #f5f5f5;
+}
+
+[data-theme="light"] .from-\[\#141414\] {
+  --tw-gradient-from: var(--bg-primary) !important;
+}
+
+[data-theme="light"] .via-\[\#141414\]\/70 {
+  --tw-gradient-via: rgba(245, 245, 245, 0.7) !important;
+}
+
+[data-theme="light"] .to-transparent {
+  --tw-gradient-to: transparent !important;
 }
 
 /* ============================================

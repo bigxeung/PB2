@@ -1,7 +1,9 @@
+import { useEffect } from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
 import ProtectedRoute from './components/ProtectedRoute';
-import { useAppSelector } from './store/hooks';
+import { useAppSelector, useAppDispatch } from './store/hooks';
+import { loadGenres } from './store/genreSlice';
 
 // Pages
 import SignIn from './pages/SignIn';
@@ -13,7 +15,15 @@ import Wishlist from './pages/Wishlist';
 const basename = import.meta.env.BASE_URL;
 
 function AppRoutes() {
+  const dispatch = useAppDispatch();
   const isLoggedIn = useAppSelector((state) => state.auth.isLoggedIn);
+
+  // 로그인 상태일 때 장르 목록 로드
+  useEffect(() => {
+    if (isLoggedIn) {
+      dispatch(loadGenres());
+    }
+  }, [isLoggedIn, dispatch]);
 
   return (
     <Routes>

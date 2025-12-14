@@ -242,6 +242,181 @@ main (production)
 
 자세한 내용: [TMDB API Documentation](https://developer.themoviedb.org/docs)
 
+## Testing
+
+```bash
+npm run test           # 테스트 실행 (watch mode)
+npm run test:run       # 테스트 1회 실행
+npm run test:coverage  # 커버리지 리포트 생성
+```
+
+### Test Structure
+
+```
+src/
+├── components/
+│   └── MovieCard.test.tsx    # 컴포넌트 테스트
+├── utils/
+│   └── auth.test.ts          # 유틸리티 테스트
+└── test/
+    └── setup.ts              # 테스트 설정
+```
+
+### Coverage Goals
+
+| Category | Target |
+|----------|--------|
+| Statements | 70% |
+| Branches | 60% |
+| Functions | 70% |
+| Lines | 70% |
+
+---
+
+## AI Development Assistant
+
+이 프로젝트는 Claude AI를 활용하여 개발 생산성을 향상시켰습니다.
+
+### Prompt Engineering Techniques Used
+
+#### 1. Chain of Thought (CoT) Prompting
+
+복잡한 구현 작업 시 단계별 사고 과정을 통해 문제 해결:
+
+```
+사용자: "로그인/회원가입 페이지에 슬라이딩 패널 애니메이션을 구현해줘"
+
+AI 응답 과정:
+1. 현재 SignIn.tsx 구조 분석
+2. CSS 애니메이션 요구사항 파악 (transform, transition)
+3. 데스크톱/모바일 반응형 고려
+4. 접근성 (prefers-reduced-motion) 고려
+5. 단계별 구현 진행
+```
+
+#### 2. Few-Shot Prompting
+
+예시를 제공하여 원하는 출력 형식 유도:
+
+```
+사용자: "커밋 메시지 컨벤션 예시"
+
+예시 제공:
+- feat: add movie search filter by genre
+- fix: resolve infinite scroll not triggering
+- docs: update README with installation guide
+
+결과: 일관된 커밋 메시지 생성
+```
+
+#### 3. Role-Based Prompting
+
+AI에게 특정 역할 부여:
+
+```
+"프론트엔드 시니어 개발자로서 이 코드를 리뷰해줘"
+"접근성 전문가 관점에서 개선점을 찾아줘"
+```
+
+### AI-Assisted Development Areas
+
+#### UI/UX 개선
+
+| 영역 | AI 기여 |
+|------|---------|
+| CSS Animations | 슬라이딩 패널, 호버 효과, 페이드 인/아웃 |
+| Responsive Design | 모바일 우선 반응형 레이아웃 |
+| Transitions | 버튼, 카드, 모달 트랜지션 |
+| Accessibility | ARIA labels, 키보드 네비게이션, focus states |
+
+##### Animation Examples
+
+**Input Animation (Form Fields)**
+```css
+.form-group input:focus ~ label {
+  top: 0.625rem;
+  transform: translateY(0);
+  font-size: 0.7rem;
+}
+```
+
+**Responsive Design**
+```css
+@media (min-width: 768px) {
+  .auth-container {
+    max-width: 850px;
+    min-height: 500px;
+  }
+}
+```
+
+**Simple Transition**
+```css
+.movie-card {
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+.movie-card:hover {
+  transform: scale(1.05);
+}
+```
+
+**Complex Transition (Sliding Panel)**
+```css
+.auth-overlay {
+  transition: transform 0.6s cubic-bezier(0.65, 0, 0.35, 1);
+}
+.auth-container.signup-mode .auth-overlay {
+  transform: translateX(-100%);
+}
+```
+
+**Complex Animation (Loading Spinner)**
+```css
+@keyframes bounce {
+  0%, 100% { transform: translateY(0); opacity: 1; }
+  50% { transform: translateY(-15px); opacity: 0.5; }
+}
+```
+
+#### 개발 보조
+
+| 기능 | 설명 |
+|------|------|
+| Code Review | 코드 품질, 성능, 보안 검토 |
+| Bug Detection | 잠재적 버그 및 엣지 케이스 식별 |
+| Optimization | 렌더링 최적화, 메모이제이션 제안 |
+| Best Practices | React 패턴, TypeScript 활용 |
+
+#### 문서화
+
+| 항목 | AI 생성 |
+|------|---------|
+| JSDoc Comments | 컴포넌트, 함수 문서화 |
+| API Documentation | docs/API.md |
+| Commit Messages | Conventional Commits 형식 |
+| README Sections | 이 섹션 포함 |
+
+#### 테스트
+
+| 항목 | AI 생성 |
+|------|---------|
+| Unit Tests | MovieCard.test.tsx, auth.test.ts |
+| Test Setup | vitest 설정, mock 구성 |
+| Edge Cases | 빈 데이터, null 값 처리 |
+| Coverage Goals | 커버리지 목표 설정 |
+
+### AI Limitations & Human Review
+
+AI가 생성한 코드는 반드시 다음을 확인해야 합니다:
+
+- [ ] 보안 취약점 검토 (XSS, injection 등)
+- [ ] 성능 영향 확인
+- [ ] 접근성 표준 준수
+- [ ] 브라우저 호환성 테스트
+- [ ] 실제 사용자 시나리오 테스트
+
+---
+
 ## Deployment
 
 GitHub Actions를 통한 자동 배포 (GitHub Pages)
@@ -249,6 +424,8 @@ GitHub Actions를 통한 자동 배포 (GitHub Pages)
 1. Repository Settings > Secrets에 `VITE_TMDB_API_KEY` 추가
 2. Settings > Pages > Source를 "GitHub Actions"로 설정
 3. main 브랜치에 push하면 자동 배포
+
+---
 
 ## Related Links
 

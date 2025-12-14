@@ -4,6 +4,7 @@ import { faTimes, faPlay, faStar, faHeart as faHeartSolid } from '@fortawesome/f
 import { faHeart as faHeartRegular } from '@fortawesome/free-regular-svg-icons';
 import type { Movie } from '../types';
 import { getImageUrl } from '../utils/tmdb';
+import { addToViewHistory } from '../utils/storage';
 import { useAppSelector, useAppDispatch } from '../store/hooks';
 import { addItem, removeItem } from '../store/wishlistSlice';
 import toast from 'react-hot-toast';
@@ -19,7 +20,7 @@ function MovieDetailModal({ movie, isOpen, onClose }: MovieDetailModalProps) {
   const wishlistItems = useAppSelector((state) => state.wishlist.items);
   const isWishlisted = wishlistItems.some(item => item.id === movie.id);
 
-  // ESC 키로 닫기
+  // ESC 키로 닫기 + 시청 기록 저장
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Escape') onClose();
@@ -28,13 +29,21 @@ function MovieDetailModal({ movie, isOpen, onClose }: MovieDetailModalProps) {
     if (isOpen) {
       document.addEventListener('keydown', handleKeyDown);
       document.body.style.overflow = 'hidden';
+
+      // 시청 기록에 추가
+      addToViewHistory({
+        id: movie.id,
+        title: movie.title,
+        poster_path: movie.poster_path,
+        vote_average: movie.vote_average,
+      });
     }
 
     return () => {
       document.removeEventListener('keydown', handleKeyDown);
       document.body.style.overflow = 'unset';
     };
-  }, [isOpen, onClose]);
+  }, [isOpen, onClose, movie]);
 
   const handleWishlistToggle = () => {
     if (isWishlisted) {
@@ -69,6 +78,7 @@ function MovieDetailModal({ movie, isOpen, onClose }: MovieDetailModalProps) {
         {/* 닫기 버튼 */}
         <button
           onClick={onClose}
+          aria-label="닫기"
           className="absolute top-4 right-4 z-10 w-9 h-9 bg-[#181818] rounded-full flex items-center justify-center text-white hover:bg-[#282828] transition-colors"
         >
           <FontAwesomeIcon icon={faTimes} />

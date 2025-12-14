@@ -5,10 +5,20 @@ import type { PasswordStrength, ValidationResult } from '../types';
 // API 키 난독화 (간단한 Base64 + SALT)
 const SALT = 'netflix-clone-2024-secret-key';
 
+// Unicode 안전한 Base64 인코딩 (한글/특수문자 지원)
+const utf8ToBase64 = (str: string): string => {
+  return btoa(unescape(encodeURIComponent(str)));
+};
+
+// Unicode 안전한 Base64 디코딩 (한글/특수문자 지원)
+const base64ToUtf8 = (str: string): string => {
+  return decodeURIComponent(escape(atob(str)));
+};
+
 export const encodeApiKey = (apiKey: string): string => {
   try {
     const combined = apiKey + SALT;
-    return btoa(combined);
+    return utf8ToBase64(combined);
   } catch (error) {
     console.error('API 키 인코딩 실패:', error);
     return apiKey; // 실패 시 원본 반환
@@ -17,7 +27,7 @@ export const encodeApiKey = (apiKey: string): string => {
 
 export const decodeApiKey = (encoded: string): string | null => {
   try {
-    const decoded = atob(encoded);
+    const decoded = base64ToUtf8(encoded);
     return decoded.replace(SALT, '');
   } catch (error) {
     console.error('API 키 디코딩 실패:', error);

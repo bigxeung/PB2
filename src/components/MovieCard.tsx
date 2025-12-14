@@ -4,24 +4,57 @@ import { faHeart as faHeartRegular } from '@fortawesome/free-regular-svg-icons';
 import { faStar } from '@fortawesome/free-solid-svg-icons';
 import type { Movie } from '../types';
 import { getImageUrl } from '../utils/tmdb';
-import { type MouseEvent, useState } from 'react';
+import { type MouseEvent, type KeyboardEvent, useState, useMemo } from 'react';
 import toast from 'react-hot-toast';
 import { useAppSelector, useAppDispatch } from '../store/hooks';
 import { addItem, removeItem } from '../store/wishlistSlice';
 import MovieDetailModal from './MovieDetailModal';
 
+/**
+ * MovieCard 컴포넌트 Props
+ * @interface MovieCardProps
+ * @property {Movie} movie - 표시할 영화 데이터
+ * @property {function} [onWishlistChange] - 위시리스트 변경 시 콜백
+ */
 interface MovieCardProps {
   movie: Movie;
   onWishlistChange?: () => void;
 }
 
+/**
+ * 영화 카드 컴포넌트
+ * 영화 포스터, 제목, 평점, 줄거리를 표시하고 위시리스트 토글 및 상세 모달 기능 제공
+ *
+ * @component
+ * @example
+ * <MovieCard movie={movieData} onWishlistChange={() => refetch()} />
+ */
 function MovieCard({ movie, onWishlistChange }: MovieCardProps) {
   const dispatch = useAppDispatch();
   const wishlistItems = useAppSelector((state) => state.wishlist.items);
+  const genreMap = useAppSelector((state) => state.genre.genreMap);
   const isWishlisted = wishlistItems.some(item => item.id === movie.id);
   const [isHovered, setIsHovered] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
+  // 장르 이름 배열 (최대 2개)
+  const genreNames = useMemo(() => {
+    if (movie.genres && movie.genres.length > 0) {
+      return movie.genres.slice(0, 2).map(g => g.name);
+    }
+    if (movie.genre_ids && movie.genre_ids.length > 0) {
+      return movie.genre_ids
+        .slice(0, 2)
+        .map(id => genreMap[id])
+        .filter(Boolean);
+    }
+    return [];
+  }, [movie.genres, movie.genre_ids, genreMap]);
+
+  /**
+   * 위시리스트 토글 핸들러
+   * @param e - 마우스 이벤트 (이벤트 버블링 방지용)
+   */
   const handleWishlistToggle = (e: MouseEvent<HTMLButtonElement>): void => {
     e.stopPropagation();
 
@@ -46,17 +79,30 @@ function MovieCard({ movie, onWishlistChange }: MovieCardProps) {
     }
   };
 
+  /** 카드 클릭 시 상세 모달 열기 */
   const handleCardClick = () => {
     setIsModalOpen(true);
+  };
+
+  /** 키보드 접근성 - Enter/Space로 모달 열기 */
+  const handleKeyDown = (e: KeyboardEvent<HTMLDivElement>) => {
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      setIsModalOpen(true);
+    }
   };
 
   return (
     <>
       <div
-        className="movie-card relative group"
+        className="movie-card relative group focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 focus:ring-offset-gray-900"
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
         onClick={handleCardClick}
+        onKeyDown={handleKeyDown}
+        tabIndex={0}
+        role="button"
+        aria-label={`${movie.title} 상세 정보 보기`}
       >
       {/* 포스터 이미지 */}
       <div className="aspect-[2/3] rounded overflow-hidden bg-gray-800">
@@ -96,6 +142,20 @@ function MovieCard({ movie, onWishlistChange }: MovieCardProps) {
           <span className="mx-1.5">•</span>
           <span>{movie.release_date?.split('-')[0]}</span>
         </div>
+
+        {/* 장르 태그 */}
+        {genreNames.length > 0 && (
+          <div className="flex flex-wrap gap-1 mb-1">
+            {genreNames.map((genre, index) => (
+              <span
+                key={index}
+                className="px-1.5 py-0.5 text-[10px] bg-red-600/80 text-white rounded"
+              >
+                {genre}
+              </span>
+            ))}
+          </div>
+        )}
 
         <p className="text-xs text-gray-400 line-clamp-2">
           {movie.overview || '줄거리 정보가 없습니다.'}

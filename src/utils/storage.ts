@@ -233,7 +233,7 @@ export const removeSearchHistoryItem = (query: string): void => {
 };
 
 // ========== 시청 기록 관리 ==========
-export const addToViewHistory = (movie: Movie): boolean => {
+export const addToViewHistory = (movie: Pick<Movie, 'id' | 'title' | 'poster_path' | 'vote_average'>): boolean => {
   const history = safeGetItem<ViewHistoryItem[]>(STORAGE_KEYS.VIEW_HISTORY, []);
 
   // 중복 제거 (같은 영화는 가장 최근 기록만)

@@ -6,7 +6,8 @@
       "Bash(npm run build:*)",
       "Bash(git add:*)",
       "Bash(git commit -m \"$(cat <<''EOF''\nfeat: complete TypeScript migration with Tailwind CSS 4\n\n- Migrate all components, pages, hooks, and utils from JS/JSX to TS/TSX\n- Add type definitions in src/types/index.ts\n- Configure tsconfig.json with strict mode and path aliases\n- Update to Tailwind CSS 4 with @tailwindcss/postcss\n- Fix PostCSS configuration for Tailwind CSS 4 compatibility\n- Add CLAUDE.md for AI assistant guidance\n\n🤖 Generated with [Claude Code](https://claude.ai/code)\n\nCo-Authored-By: Claude Opus 4.5 <noreply@anthropic.com>\nEOF\n)\")",
-      "Bash(git push:*)"
+      "Bash(git push:*)",
+      "Bash(\"C:\\Program Files\\GitHub CLI\\gh.exe\" pr create --base main --head feature/dark-mode-toggle --title \"feat: dark mode toggle, genre display, view history, search debouncing\" --body \"$(cat <<''EOF''\n## Summary\n- Add dark/light mode toggle UI in Header\n- Add genre tags display on MovieCard hover\n- Add view history tracking when movie modal opens\n- Implement 500ms search debouncing for API optimization\n- Fix Base64 encoding for mobile login support\n\n## Test plan\n- [ ] Toggle theme button in header (desktop/mobile)\n- [ ] Verify genre tags appear on movie card hover\n- [ ] Check view history is saved in localStorage when viewing movie details\n- [ ] Test search input debouncing (type and wait 500ms)\n\n🤖 Generated with [Claude Code](https://claude.com/claude-code)\nEOF\n)\")"
     ],
     "deny": [],
     "ask": []

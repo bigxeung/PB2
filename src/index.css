@@ -375,6 +375,23 @@ body {
   width: 100%;
   height: 100%;
   min-height: inherit;
+  z-index: 1;
+}
+
+@media (min-width: 768px) {
+  .auth-forms {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 50%;
+    height: 100%;
+    transition: left 0.6s cubic-bezier(0.65, 0, 0.35, 1);
+    will-change: left;
+  }
+
+  .auth-container.signup-mode .auth-forms {
+    left: 50%;
+  }
 }
 
 .auth-form-container {
@@ -387,30 +404,25 @@ body {
   box-sizing: border-box;
 }
 
-/* 데스크톱에서 폼은 왼쪽 절반 */
+/* 데스크톱에서 폼은 왼쪽 절반에 고정 */
 @media (min-width: 768px) {
   .auth-form-container {
     position: absolute;
     top: 0;
-    width: 50%;
+    left: 0;
+    width: 100%;
     height: 100%;
     padding: 2.5rem;
-    transition:
-      transform 0.6s cubic-bezier(0.65, 0, 0.35, 1),
-      opacity 0.4s ease;
-    will-change: transform, opacity;
+    transition: opacity 0.4s ease;
+    will-change: opacity;
   }
 
   .login-form-container {
-    left: 0;
-    transform: translateX(0);
     opacity: 1;
     z-index: 2;
   }
 
   .signup-form-container {
-    left: 0;
-    transform: translateX(0);
     opacity: 0;
     pointer-events: none;
     z-index: 1;
@@ -420,6 +432,7 @@ body {
   .auth-container.signup-mode .login-form-container {
     opacity: 0;
     pointer-events: none;
+    z-index: 1;
   }
 
   .auth-container.signup-mode .signup-form-container {
@@ -458,18 +471,18 @@ body {
     display: flex;
     position: absolute;
     top: 0;
-    right: 0;
+    left: 50%;
     width: 50%;
     height: 100%;
     background: linear-gradient(135deg, var(--netflix-red) 0%, #8b0000 100%);
     overflow: hidden;
-    transition: transform 0.6s cubic-bezier(0.65, 0, 0.35, 1);
-    will-change: transform;
+    transition: left 0.6s cubic-bezier(0.65, 0, 0.35, 1);
+    will-change: left;
     z-index: 10;
   }
 
   .auth-container.signup-mode .auth-overlay {
-    transform: translateX(-100%);
+    left: 0;
   }
 }
 

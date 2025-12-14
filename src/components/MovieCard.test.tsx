@@ -9,6 +9,7 @@ import { Provider } from 'react-redux';
 import { configureStore } from '@reduxjs/toolkit';
 import MovieCard from './MovieCard';
 import wishlistReducer from '../store/wishlistSlice';
+import genreReducer from '../store/genreSlice';
 import type { Movie } from '../types';
 
 // 테스트용 Mock 영화 데이터
@@ -33,8 +34,21 @@ const createTestStore = (preloadedState = {}) => {
   return configureStore({
     reducer: {
       wishlist: wishlistReducer,
+      genre: genreReducer,
     },
-    preloadedState,
+    preloadedState: {
+      genre: {
+        genres: [
+          { id: 28, name: '액션' },
+          { id: 12, name: '모험' },
+          { id: 35, name: '코미디' },
+        ],
+        genreMap: { 28: '액션', 12: '모험', 35: '코미디' },
+        isLoading: false,
+        error: null,
+      },
+      ...preloadedState,
+    },
   });
 };
 

@@ -110,7 +110,7 @@ describe('MovieCard', () => {
       const user = userEvent.setup();
       renderWithProvider(<MovieCard movie={mockMovie} />);
 
-      const card = screen.getByRole('button', { name: /테스트 영화 상세 정보 보기/i });
+      screen.getByRole('button', { name: /테스트 영화 상세 정보 보기/i });
       await user.tab();
       await user.keyboard('{Enter}');
 

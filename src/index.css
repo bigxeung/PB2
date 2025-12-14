@@ -1442,10 +1442,11 @@ html {
     transform: scale(0.98);
   }
 
-  /* 터치 타겟 크기 최소 44px 보장 (접근성) */
-  button,
-  a,
-  [role="button"] {
+  /* 터치 타겟 크기 최소 44px 보장 - 네비게이션 버튼만 적용 */
+  nav button,
+  nav a,
+  header button,
+  .touch-target {
     min-height: 44px;
     min-width: 44px;
   }

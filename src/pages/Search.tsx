@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, type FormEvent, type ChangeEvent } from 'react';
+import { useState, useEffect, useRef, useCallback, type FormEvent, type ChangeEvent } from 'react';
 import type { Movie, Genre } from '../types';
 import Header from '../components/Header';
 import MovieCard from '../components/MovieCard';
@@ -30,6 +30,7 @@ function Search() {
   const [sortBy, setSortBy] = useState<string>('popularity.desc');
 
   const searchInputRef = useRef<HTMLInputElement>(null);
+  const debounceTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   // 장르 목록 로드
   useEffect(() => {
@@ -44,14 +45,18 @@ function Search() {
     loadGenres();
     setSearchHistory(getSearchHistory());
     searchInputRef.current?.focus();
+
+    // cleanup debounce timer
+    return () => {
+      if (debounceTimerRef.current) {
+        clearTimeout(debounceTimerRef.current);
+      }
+    };
   }, []);
 
-  // 검색 실행
-  const handleSearch = async (e: FormEvent<HTMLFormElement>): Promise<void> => {
-    e.preventDefault();
-
-    if (query.trim().length < 2) {
-      toast.error('검색어는 2자 이상 입력해주세요.');
+  // 실제 검색 실행 함수
+  const executeSearch = useCallback(async (searchQuery: string): Promise<void> => {
+    if (searchQuery.trim().length < 2) {
       return;
     }
 
@@ -59,7 +64,7 @@ function Search() {
     setHasSearched(true);
 
     try {
-      const data = await searchMovies(query.trim());
+      const data = await searchMovies(searchQuery.trim());
       let results = data.results;
 
       // 클라이언트 필터링
@@ -76,7 +81,7 @@ function Search() {
       setMovies(results);
 
       // 검색 기록 저장
-      addSearchHistory(query.trim(), results.length);
+      addSearchHistory(searchQuery.trim(), results.length);
       setSearchHistory(getSearchHistory());
 
       if (results.length === 0) {
@@ -88,6 +93,45 @@ function Search() {
     } finally {
       setIsLoading(false);
     }
+  }, [selectedGenre, minRating, sortBy]);
+
+  // Debounced 검색 (입력 시 자동 검색)
+  const debouncedSearch = useCallback((searchQuery: string): void => {
+    // 기존 타이머 취소
+    if (debounceTimerRef.current) {
+      clearTimeout(debounceTimerRef.current);
+    }
+
+    // 500ms 후 검색 실행
+    debounceTimerRef.current = setTimeout(() => {
+      if (searchQuery.trim().length >= 2) {
+        executeSearch(searchQuery);
+      }
+    }, 500);
+  }, [executeSearch]);
+
+  // 입력 변경 핸들러
+  const handleInputChange = (e: ChangeEvent<HTMLInputElement>): void => {
+    const newQuery = e.target.value;
+    setQuery(newQuery);
+    debouncedSearch(newQuery);
+  };
+
+  // 폼 제출 핸들러 (Enter 키)
+  const handleSearch = async (e: FormEvent<HTMLFormElement>): Promise<void> => {
+    e.preventDefault();
+
+    // 기존 debounce 타이머 취소
+    if (debounceTimerRef.current) {
+      clearTimeout(debounceTimerRef.current);
+    }
+
+    if (query.trim().length < 2) {
+      toast.error('검색어는 2자 이상 입력해주세요.');
+      return;
+    }
+
+    await executeSearch(query);
   };
 
   // 필터로 검색 (검색어 없이)
@@ -189,7 +233,7 @@ function Search() {
               ref={searchInputRef}
               type="text"
               value={query}
-              onChange={(e: ChangeEvent<HTMLInputElement>) => setQuery(e.target.value)}
+              onChange={handleInputChange}
               placeholder="영화 제목을 검색하세요..."
               className="flex-1 px-6 py-4 bg-gray-800 text-white rounded-l-lg focus:outline-none focus:ring-2 focus:ring-red-600 transition-all"
             />
